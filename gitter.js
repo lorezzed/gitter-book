@@ -4,11 +4,7 @@ module.exports = {
 
 var https = require('https');
 
-var storedToken = '';
 function stream(roomId, token, callback) {
-    if (token)
-        storedToken = token;
-    token = token || storedToken;
 
     var hostname = roomId
         ? 'stream.gitter.im'
@@ -26,7 +22,7 @@ function stream(roomId, token, callback) {
     };
 
     if (!callback)
-        callback = function (data) { console.log(data); }
+        callback = function (data) { console.log(data); };
 
     var req = https.request(options, function (res) {
         var cache = '';
