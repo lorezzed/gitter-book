@@ -2,8 +2,10 @@ var R = require('ramda')
 ,	S = require('sanctuary');
 var gitter = require('./gitter')
 ,	token = require('./token');
-var roomId = 'lorezzed/sup';
-// var roomId = 'ramda/ramda';
+
+var log = R.tap(console.log);
+
+var roomId = 'ramda/ramda';
 
 listenRoom(roomId);
 
@@ -15,7 +17,7 @@ function listenRoom(id) {
 		
 		function isRoom(roomName) {
 			return function(room) {
-				console.log(roomName, '===', room.name);
+				// console.log(roomName, '===', room.name);
 				if(room.name !== roomName)
 					return
 				console.log('listening to', roomName)
@@ -25,9 +27,18 @@ function listenRoom(id) {
 	}
 }
 
+
+
 function handleStream(stream) {
-	// console.log(stream);
-	var name = stream.fromUser.username;
-	var message = stream.text;
-	console.log('%s: %s', name, message);
+	try {
+		var username = R.path(['fromUser', 'username']);
+		var message = R.prop('text');
+		var output = R.converge(R.unapply(R.join(': ')), [username, message]);
+		var program = R.pipe(output, log);
+		program(stream);
+	}
+	catch(e) {
+		log(e);
+	}
+	
 }
