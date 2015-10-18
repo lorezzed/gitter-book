@@ -1,26 +1,27 @@
 var R = require('ramda')
-	, S = require('sanctuary');
+, 	S = require('sanctuary');
 var gitter = require('./gitter')
-	, token = require('./token')
-	, roomName = require('./roomName') || 'ramda/ramda';
-
+, 	TOKEN = require('./token')
+, 	ROOM_NAME = require('./roomName') || 'ramda/ramda';
 var log = R.tap(console.log);
 
 
-var listenRoom = id => {
-	var callback = rooms => {
-		var isRoom = roomName => room => room.name === roomName;
-		var room = rooms.filter(isRoom(id))[0];
-		if (!room)
-			log('nothing found for ' + room.name);
-		log('listening to ' + room.name);
-		gitter.stream(room.id, token, handleStream);
-	};
 
-	gitter.stream(null, token, callback);
+var listenToRoom = name => {
+	var callback = lookupRoom(name);
+	gitter.stream(null, TOKEN, callback);
 }
 
-listenRoom(roomName);
+var lookupRoom = name => rooms => {
+	var hasName = roomName => room => room.name === roomName;
+	var room = R.find(hasName(name))(rooms);
+	log('listening to ' + room.name);
+	gitter.stream(room.id, TOKEN, handleStream);
+};
+
+listenToRoom(ROOM_NAME);
+
+
 
 var handleStream = stream => {
 	try {
